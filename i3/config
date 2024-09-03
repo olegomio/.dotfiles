@@ -16,8 +16,11 @@ floating_modifier $mod
 bindsym $mod+Return exec i3-sensible-terminal -e tmux
 bindsym $mod+Shift+Return exec --no-startup-id ~/.config/i3/tmux-shell-pathfinder.sh
 
-# Window kill command
-bindsym $mod+Shift+q kill
+# Window + tmux kill session
+bindsym $mod+Shift+q exec tmux kill-session
+
+# Window kill
+bindsym $mod+q kill
 
 # start program launcher
 bindsym $mod+d exec --no-startup-id rofi -show run
