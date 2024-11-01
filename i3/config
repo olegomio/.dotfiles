@@ -1,3 +1,5 @@
+exec --no-startup-id setxkbmap us -variant intl
+
 set $mod Mod1
 
 new_window pixel 1
@@ -25,7 +27,6 @@ bindsym $mod+q kill
 # start program launcher
 bindsym $mod+d exec --no-startup-id rofi -show run
 
-exec --no-startup-id setxkbmap us -variant intl
 
 # change focus
 bindsym $mod+h focus left
