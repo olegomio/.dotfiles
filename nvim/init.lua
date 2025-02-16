@@ -13,30 +13,30 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Plugins mit Lazy.nvim verwalten
 require("lazy").setup({
-    { "nvim-treesitter/nvim-treesitter",          build = ":TSUpdate" },
+    { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
     { "neovim/nvim-lspconfig" },
     { "williamboman/mason.nvim" },
     { "williamboman/mason-lspconfig.nvim" },
-    { "hrsh7th/nvim-cmp" },     -- Autocomplete
+    { "hrsh7th/nvim-cmp" }, -- Autocomplete
     { "hrsh7th/cmp-nvim-lsp" }, -- LSP-Autocomplete
-    { "L3MON4D3/LuaSnip" },     -- Snippet Engine
-    { "nvim-telescope/telescope.nvim",            dependencies = { "nvim-lua/plenary.nvim" } },
+    { "L3MON4D3/LuaSnip" }, -- Snippet Engine
+    { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     { "nvim-lualine/lualine.nvim" }, -- Statusline
-    { "nvim-tree/nvim-tree.lua" },   -- File Explorer
-    { "akinsho/bufferline.nvim" },   -- Tabs
-    { "folke/tokyonight.nvim" },     -- Farben
+    { "nvim-tree/nvim-tree.lua" }, -- File Explorer
+    { "akinsho/bufferline.nvim" }, -- Tabs
+    { "folke/tokyonight.nvim" }, -- Farben
 })
 
 -- ========== Allgemeine Einstellungen ==========
-vim.opt.number = true             -- Zeilennummern anzeigen
-vim.opt.relativenumber = true     -- Relative Zeilennummern
-vim.opt.tabstop = 4               -- Tabs auf 4 setzen
-vim.opt.shiftwidth = 4            -- Indent auf 4 setzen
-vim.opt.expandtab = true          -- Tabs in Spaces umwandeln
-vim.opt.mouse = "a"               -- Maus aktivieren
+vim.opt.number = true -- Zeilennummern anzeigen
+vim.opt.relativenumber = true -- Relative Zeilennummern
+vim.opt.tabstop = 4 -- Tabs auf 4 setzen
+vim.opt.shiftwidth = 4 -- Indent auf 4 setzen
+vim.opt.expandtab = true -- Tabs in Spaces umwandeln
+vim.opt.mouse = "a" -- Maus aktivieren
 vim.opt.clipboard = "unnamedplus" -- System-Clipboard nutzen
-vim.opt.termguicolors = true      -- True Colors aktivieren
+vim.opt.termguicolors = true -- True Colors aktivieren
 vim.cmd("colorscheme tokyonight")
 
 -- ========== Keybindings ==========
@@ -57,15 +57,15 @@ end, { silent = true, desc = "Format Code" })
 require("mason").setup()
 require("mason-lspconfig").setup({
     ensure_installed = {
-        "volar",        -- Vue
-        "ts_ls",        -- TypeScript (Ersetzt `tsserver`)
-        "cssls",        -- CSS
-        "jsonls",       -- JSON
-        "yamlls",       -- YAML
-        "eslint",       -- ESLint
-        "intelephense", -- PHP für Laravel
-        "lua_ls",       -- Lua
-        "pyright"       -- Python
+        "volar",                -- Vue
+        "ts_ls",                -- TypeScript (Ersetzt `tsserver`)
+        "cssls",                -- CSS
+        "jsonls",               -- JSON
+        "yamlls",               -- YAML
+        "eslint",               -- ESLint
+        "intelephense",         -- PHP für Laravel
+        "lua_ls",               -- Lua
+        "pyright"               -- Python
     }
 })
 
@@ -76,7 +76,7 @@ lspconfig.lua_ls.setup({})
 lspconfig.pyright.setup({})
 lspconfig.intelephense.setup({})
 lspconfig.volar.setup({})
-lspconfig.ts_ls.setup({}) -- Ersetzt tsserver!
+lspconfig.ts_ls.setup({})  -- Ersetzt tsserver!
 lspconfig.cssls.setup({})
 lspconfig.jsonls.setup({})
 lspconfig.yamlls.setup({})
@@ -99,19 +99,8 @@ cmp.setup({
 require("lualine").setup({ options = { theme = "tokyonight" } })
 
 -- ========== File Explorer ==========
-require("nvim-tree").setup({
-  renderer = {
-    icons = {
-      show = {
-        file = true,
-        folder = true,
-        folder_arrow = true,
-        git = true,
-      },
-    },
-  },
-})
--- require'nvim-web-devicons'.setup()
+require("nvim-tree").setup()
+
 -- ========== Treesitter ==========
 require("nvim-treesitter.configs").setup({
     ensure_installed = { "lua", "python", "javascript", "html", "css" },
@@ -134,3 +123,4 @@ require("telescope").setup({
 })
 
 require("telescope").load_extension("fzf")
+
