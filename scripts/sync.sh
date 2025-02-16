@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 echo "🔄 Neuladen der Konfiguration nach Git-Branch-Wechsel..."
 
