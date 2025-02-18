@@ -1,7 +1,11 @@
 #!/bin/zsh
 set -euo pipefail
 
-# Sicherstellen, dass wir vom master ausgehen
+# Speichere den aktuellen Branch
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+echo "Aktueller Branch: $current_branch"
+
+# Arbeite mit master
 echo "Wechsle zu master und aktualisiere..."
 git checkout master && git pull
 
@@ -22,6 +26,9 @@ for branch in "${branches[@]}"; do
   git push
 done
 
-git checkout master
+# Wechsle zurück zum ursprünglichen Branch
 echo "======================================"
+echo "Wechsle zurück zum ursprünglichen Branch: $current_branch"
+git checkout "$current_branch"
+
 echo "Rebase-Vorgang abgeschlossen für: ${branches[*]}"
