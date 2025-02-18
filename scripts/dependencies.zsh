@@ -207,6 +207,7 @@ for dep in "${dependencies[@]}"; do
     read -r answer
     if [[ "$answer" =~ ^[Yy] ]]; then
       backup_and_merge "$dest" "$repo_file" "$merge_file"
+      lnsp "$(pwd)/$repo_file" "$dest"
     else
       backup_file "$dest"
       lnsp "$(pwd)/$repo_file" "$dest"
@@ -217,4 +218,6 @@ done
 echo "-----------------------------------------------------"
 echo "Configuration sync complete."
 log "=== Configuration sync complete ==="
+
+
 
