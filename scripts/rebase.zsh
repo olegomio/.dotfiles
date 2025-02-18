@@ -32,3 +32,10 @@ echo "Wechsle zurück zum ursprünglichen Branch: $current_branch"
 git checkout "$current_branch"
 
 echo "Rebase-Vorgang abgeschlossen für: ${branches[*]}"
+
+# Reload   
+echo "======================================"
+echo "start sync"
+./sync
+
+echo "Rebase-Vorgang abgeschlossen für: ${branches[*]}"
