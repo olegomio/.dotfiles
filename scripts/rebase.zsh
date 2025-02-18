@@ -18,7 +18,10 @@ for branch in "${branches[@]}"; do
   git rebase master
   echo "Hole nach Rebase nochmal die Änderungen für $branch..."
   git pull
+  echo "Push nach Rebase"
+  git push
 done
 
+git checkout master
 echo "======================================"
 echo "Rebase-Vorgang abgeschlossen für: ${branches[*]}"
