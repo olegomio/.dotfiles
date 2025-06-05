@@ -1,3 +1,14 @@
+alias ret-de='sudo killall --interactive --signal SIGINT openconnect; sleep 1; sudo openconnect --protocol=gp vpnaccess-de.retarus.com --certificate=/home/alexanderg/Documents/certificate.crt --sslkey=/home/alexanderg/Documents/private.key --user=alexanderg --quiet --background --pid-file=/run/openconnect.pid --mtu=1400 --base-mtu=1500 --servercert pin-sha256:cB0+M/bos7xbgP4tG0k1JIKGHRV02XjQz3dgXMaLTk8='
+
+alias ret-us='sudo killall --interactive --signal SIGINT openconnect; sleep 1; sudo openconnect --protocol=gp vpnaccess-us.retarus.com --certificate=/home/alexanderg/Documents/certificate.crt --sslkey=/home/alexanderg/Documents/private.key --user=alexanderg --quiet --background --pid-file=/run/openconnect.pid --mtu=1400 --base-mtu=1500 --servercert pin-sha256:cB0+M/bos7xbgP4tG0k1JIKGHRV02XjQz3dgXMaLTk8='
+ 
+
+alias disc-gp='sudo killall --signal SIGINT openconnect'
+alias list-gp='sudo ps -aux | grep openconnect | grep -v grep'
+
+# Headset dongle reset
+alias hs='systemctl --user restart wireplumber; systemctl --user restart pipewire'
+
 lnsp() {
   if [ "$#" -ne 2 ]; then
     echo "Usage: lnsp <Pfad zur eigentlichen Datei> <Pfad zum Symlink>"
