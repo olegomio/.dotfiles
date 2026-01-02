@@ -95,7 +95,7 @@ source $ZSH/oh-my-zsh.sh
 # else
 #   export EDITOR='nvim'
 # fi
-
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
