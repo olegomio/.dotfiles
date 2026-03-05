@@ -1,5 +1,9 @@
 exec --no-startup-id setxkbmap us -variant intl
 
+exec_always --no-startup-id sh -c 'xrandr --newmode "1920x984_60.00" 157.25 1920 2040 2248 2576 984 987 997 1024 -hsync +vsync 2>/dev/null || true'
+exec_always --no-startup-id sh -c 'xrandr --addmode Virtual-1 "1920x984_60.00" 2>/dev/null || true'
+exec_always --no-startup-id xrandr --output Virtual-1 --mode "1920x984_60.00"
+
 set $mod Mod1
 
 new_window pixel 1
