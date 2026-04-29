@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Updates /etc/hosts entry for a host by reading the A-record "content"
+# from Cloudflare API (origin IP), even if record is proxied.
+#
+# Requires: curl, jq
+# Runs best as root (systemd service)
+
+ENV_FILE="/etc/cloudflare/hosts-updater.env"
+HOSTS_FILE="/etc/hosts"
+LOCK_FILE="/run/cf-hosts-ssh-update.lock"
+
+# --- Config (can be overridden via env file) ---
+FQDN_DEFAULT="www.isarvalley.media"
+
+# --- Load secrets/config ---
+if [[ -f "$ENV_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+fi
+
+: "${CF_API_TOKEN:?Missing CF_API_TOKEN in /etc/cloudflare/hosts-updater.env}"
+: "${CF_ZONE_ID:?Missing CF_ZONE_ID in /etc/cloudflare/hosts-updater.env}"
+FQDN="${FQDN:-$FQDN_DEFAULT}"
+
+need_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "❌ Missing dependency: $1" >&2; exit 1; }; }
+need_cmd curl
+need_cmd jq
+
+# --- Lock to avoid concurrent edits ---
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+  echo "ℹ️ Another instance is running; exiting."
+  exit 0
+fi
+
+ts() { date "+%Y-%m-%d %H:%M:%S"; }
+
+echo "[$(ts)] 🔎 Cloudflare lookup for A record: $FQDN"
+
+LOOKUP_JSON="$(curl -fsS -X GET \
+  "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/dns_records?type=A&name=${FQDN}" \
+  -H "Authorization: Bearer ${CF_API_TOKEN}" \
+  -H "Content-Type: application/json")"
+
+SUCCESS="$(echo "$LOOKUP_JSON" | jq -r '.success')"
+if [[ "$SUCCESS" != "true" ]]; then
+  echo "[$(ts)] ❌ Cloudflare API error:" >&2
+  echo "$LOOKUP_JSON" | jq . >&2
+  exit 1
+fi
+
+RECORD_ID="$(echo "$LOOKUP_JSON" | jq -r '.result[0].id // empty')"
+ORIGIN_IP="$(echo "$LOOKUP_JSON" | jq -r '.result[0].content // empty')"
+
+if [[ -z "$RECORD_ID" || -z "$ORIGIN_IP" ]]; then
+  echo "[$(ts)] ❌ No A-record found for $FQDN in that zone." >&2
+  exit 1
+fi
+
+# Basic IPv4 sanity check (not perfect, but good enough)
+if ! [[ "$ORIGIN_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+  echo "[$(ts)] ❌ Record content is not an IPv4 address: $ORIGIN_IP" >&2
+  exit 1
+fi
+
+echo "[$(ts)] 🌐 Origin IP from Cloudflare: $ORIGIN_IP"
+
+BEGIN_MARKER="# BEGIN cf-hosts-ssh (managed)"
+END_MARKER="# END cf-hosts-ssh (managed)"
+DESIRED_LINE="${ORIGIN_IP} ${FQDN}"
+
+# --- Read current managed block (if any) ---
+if grep -qF "$BEGIN_MARKER" "$HOSTS_FILE"; then
+  current_block="$(awk "/$BEGIN_MARKER/{flag=1;next}/$END_MARKER/{flag=0}flag" "$HOSTS_FILE" | tr -d '\r' || true)"
+else
+  current_block=""
+fi
+
+current_line="$(echo "$current_block" | awk -v fqdn="$FQDN" '$2==fqdn{print $0}' || true)"
+
+if [[ "$current_line" == "$DESIRED_LINE" ]]; then
+  echo "[$(ts)] ✅ /etc/hosts already up to date."
+  exit 0
+fi
+
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+# --- Write hosts with a managed block (create or replace block) ---
+if grep -qF "$BEGIN_MARKER" "$HOSTS_FILE"; then
+  # Replace entire managed block content with our desired line
+  awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" -v newline="$DESIRED_LINE" '
+    $0==begin {print; print newline; inblock=1; next}
+    $0==end   {inblock=0; print; next}
+    inblock==1 {next}
+    {print}
+  ' "$HOSTS_FILE" > "$tmp"
+else
+  # Append managed block
+  cat "$HOSTS_FILE" > "$tmp"
+  {
+    echo ""
+    echo "$BEGIN_MARKER"
+    echo "$DESIRED_LINE"
+    echo "$END_MARKER"
+  } >> "$tmp"
+fi
+
+# Atomic-ish update
+install -m 0644 -o root -g root "$tmp" "$HOSTS_FILE"
+
+echo "[$(ts)] ✅ Updated /etc/hosts: $DESIRED_LINE"

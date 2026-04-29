@@ -110,6 +110,8 @@ export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias screen-hd='xrandr --newmode "1920x984_60.00" 157.25 1920 2040 2248 2576 984 987 997 1024 -hsync +vsync 2>/dev/null; xrandr --addmode Virtual-1 "1920x984_60.00" 2>/dev/null; xrandr --output Virtual-1 --mode "1920x984_60.00"'
+alias screen-wqhd='xrandr --output Virtual-1 --mode 2560x1440'
 # Automatically start tmux if not already running
 if [[ -z "$TMUX" ]]; then
     exec tmux
